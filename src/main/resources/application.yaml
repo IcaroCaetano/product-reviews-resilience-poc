@@ -1,0 +1,86 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: product-reviews-resilience-poc
+
+# ---------------------------------------------------------------------------
+# Configuracao da chamada HTTP Product API -> Reviews API.
+# Em producao/demo manual, a propria app serve a Reviews API (mesmo processo),
+# por isso o default aponta para localhost:${server.port}. Nos testes de
+# integracao esse valor e sobrescrito (@DynamicPropertySource) para apontar
+# para um servidor WireMock, permitindo simular falhas/latencia/sobrecarga.
+# ---------------------------------------------------------------------------
+app:
+  reviews:
+    base-url: http://localhost:${server.port}
+    connect-timeout: 2s
+    # read-timeout do client HTTP fica deliberadamente alto: quem deve "cortar"
+    # a chamada lenta é o Resilience4j TimeLimiter, não o cliente HTTP.
+    read-timeout: 10s
+
+# ---------------------------------------------------------------------------
+# Resilience4j - um "instance name" dedicado por módulo, cada um usado em
+# um endpoint diferente de /api/v1/products/{id}/reviews/** para que cada
+# padrão possa ser demonstrado e testado isoladamente.
+# ---------------------------------------------------------------------------
+resilience4j:
+  circuitbreaker:
+    instances:
+      reviewsCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 2s
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 5s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        recordExceptions:
+          - com.project.product_reviews_resilience_poc.client.ReviewsClientException
+
+  retry:
+    instances:
+      reviewsRetry:
+        maxAttempts: 3
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - com.project.product_reviews_resilience_poc.client.ReviewsClientException
+
+  ratelimiter:
+    instances:
+      reviewsRateLimiter:
+        limitForPeriod: 2
+        limitRefreshPeriod: 10s
+        timeoutDuration: 0ms
+
+  bulkhead:
+    instances:
+      reviewsBulkhead:
+        maxConcurrentCalls: 2
+        maxWaitDuration: 0ms
+
+  timelimiter:
+    instances:
+      reviewsTimeLimiter:
+        timeoutDuration: 1500ms
+        cancelRunningFuture: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,circuitbreakers,circuitbreakerevents,ratelimiters,bulkheads,retries
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    io.github.resilience4j: INFO
+    com.project.product_reviews_resilience_poc: DEBUG
