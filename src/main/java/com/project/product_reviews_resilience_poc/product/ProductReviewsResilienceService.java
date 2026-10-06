@@ -36,7 +36,7 @@ public class ProductReviewsResilienceService {
     }
 
     private ReviewsOutcome circuitBreakerFallback(String productId, Throwable throwable) {
-        log.warn("Circuit Breaker 'reviewsCircuitBreaker' acionou fallback para productId={}: {}",
+        log.warn("Circuit Breaker 'reviewsCircuitBreaker' activated fallback para productId={}: {}",
                 productId, throwable.toString());
         return ReviewsOutcome.fallback(productId,
                 "Circuit breaker active (" + throwable.getClass().getSimpleName() + "): using default response.");

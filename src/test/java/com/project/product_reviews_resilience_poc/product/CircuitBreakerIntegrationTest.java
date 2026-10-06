@@ -80,8 +80,6 @@ class CircuitBreakerIntegrationTest {
         wireMockServer.stubFor(get(urlPathMatching("/api/v1/reviews/.*"))
                 .willReturn(aResponse().withStatus(500)));
 
-        // minimumNumberOfCalls=5 no application.yaml: as 5 primeiras chamadas
-        // avaliam a taxa de falha (100% > 50% threshold) e abrem o circuito.
         for (int i = 0; i < 5; i++) {
             ReviewsOutcome outcome = restTemplate.getForObject(
                     url("/api/v1/products/p1/reviews/circuit-breaker"), ReviewsOutcome.class);
@@ -91,8 +89,7 @@ class CircuitBreakerIntegrationTest {
         assertThat(circuitBreakerRegistry.circuitBreaker("reviewsCircuitBreaker").getState())
                 .isEqualTo(CircuitBreaker.State.OPEN);
 
-        // Chamada extra: deve ser rejeitada localmente (CallNotPermittedException),
-        // sem nem chegar à Reviews API.
+
         ReviewsOutcome rejected = restTemplate.getForObject(
                 url("/api/v1/products/p1/reviews/circuit-breaker"), ReviewsOutcome.class);
         assertThat(rejected.status()).isEqualTo(ReviewsOutcome.Status.FALLBACK);
