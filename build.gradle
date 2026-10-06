@@ -20,6 +20,7 @@ repositories {
 ext {
 	resilience4jVersion = '2.2.0'
 	wiremockVersion = '3.3.1'
+	aspectjVersion = '1.9.22'
 }
 
 dependencies {
@@ -27,8 +28,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-
 	implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
+	implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation "org.wiremock:wiremock-standalone:${wiremockVersion}"
