@@ -39,7 +39,7 @@ public class ProductReviewsResilienceService {
         log.warn("Circuit Breaker 'reviewsCircuitBreaker' acionou fallback para productId={}: {}",
                 productId, throwable.toString());
         return ReviewsOutcome.fallback(productId,
-                "Circuit breaker ativo (" + throwable.getClass().getSimpleName() + "): usando resposta padrão.");
+                "Circuit breaker active (" + throwable.getClass().getSimpleName() + "): using default response.");
     }
 
     // ------------------------------------------------------------------

@@ -5,26 +5,13 @@ spring:
   application:
     name: product-reviews-resilience-poc
 
-# ---------------------------------------------------------------------------
-# Configuracao da chamada HTTP Product API -> Reviews API.
-# Em producao/demo manual, a propria app serve a Reviews API (mesmo processo),
-# por isso o default aponta para localhost:${server.port}. Nos testes de
-# integracao esse valor e sobrescrito (@DynamicPropertySource) para apontar
-# para um servidor WireMock, permitindo simular falhas/latencia/sobrecarga.
-# ---------------------------------------------------------------------------
 app:
   reviews:
     base-url: http://localhost:${server.port}
     connect-timeout: 2s
-    # read-timeout do client HTTP fica deliberadamente alto: quem deve "cortar"
-    # a chamada lenta é o Resilience4j TimeLimiter, não o cliente HTTP.
     read-timeout: 10s
 
-# ---------------------------------------------------------------------------
-# Resilience4j - um "instance name" dedicado por módulo, cada um usado em
-# um endpoint diferente de /api/v1/products/{id}/reviews/** para que cada
-# padrão possa ser demonstrado e testado isoladamente.
-# ---------------------------------------------------------------------------
+
 resilience4j:
   circuitbreaker:
     instances:
