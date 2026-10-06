@@ -8,10 +8,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.client.RestTemplate;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -46,8 +47,14 @@ class CircuitBreakerIntegrationTest {
         wireMockServer.stop();
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Value("${local.server.port}")
+    private int port;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String url(String path) {
+        return "http://localhost:" + port + path;
+    }
 
     @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
@@ -66,7 +73,7 @@ class CircuitBreakerIntegrationTest {
                         .withBody("[{\"id\":\"r1\",\"productId\":\"p1\",\"author\":\"ana\",\"rating\":5,\"comment\":\"ótimo\"}]")));
 
         ReviewsOutcome outcome = restTemplate.getForObject(
-                "/api/v1/products/p1/reviews/circuit-breaker", ReviewsOutcome.class);
+                url("/api/v1/products/p1/reviews/circuit-breaker"), ReviewsOutcome.class);
 
         assertThat(outcome.status()).isEqualTo(ReviewsOutcome.Status.OK);
         assertThat(outcome.reviews()).hasSize(1);
@@ -83,7 +90,7 @@ class CircuitBreakerIntegrationTest {
         // avaliam a taxa de falha (100% > 50% threshold) e abrem o circuito.
         for (int i = 0; i < 5; i++) {
             ReviewsOutcome outcome = restTemplate.getForObject(
-                    "/api/v1/products/p1/reviews/circuit-breaker", ReviewsOutcome.class);
+                    url("/api/v1/products/p1/reviews/circuit-breaker"), ReviewsOutcome.class);
             assertThat(outcome.status()).isEqualTo(ReviewsOutcome.Status.FALLBACK);
         }
 
@@ -93,7 +100,7 @@ class CircuitBreakerIntegrationTest {
         // Chamada extra: deve ser rejeitada localmente (CallNotPermittedException),
         // sem nem chegar à Reviews API.
         ReviewsOutcome rejected = restTemplate.getForObject(
-                "/api/v1/products/p1/reviews/circuit-breaker", ReviewsOutcome.class);
+                url("/api/v1/products/p1/reviews/circuit-breaker"), ReviewsOutcome.class);
         assertThat(rejected.status()).isEqualTo(ReviewsOutcome.Status.FALLBACK);
         assertThat(rejected.message()).contains("CallNotPermittedException");
 

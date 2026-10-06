@@ -5,11 +5,11 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +45,14 @@ class RateLimiterIntegrationTest {
         wireMockServer.stop();
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Value("${local.server.port}")
+    private int port;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String url(String path) {
+        return "http://localhost:" + port + path;
+    }
 
     @BeforeEach
     void resetWireMock() {
@@ -65,7 +71,7 @@ class RateLimiterIntegrationTest {
         List<ReviewsOutcome> outcomes = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             outcomes.add(restTemplate.getForObject(
-                    "/api/v1/products/p1/reviews/rate-limiter", ReviewsOutcome.class));
+                    url("/api/v1/products/p1/reviews/rate-limiter"), ReviewsOutcome.class));
         }
 
         long okCount = outcomes.stream().filter(o -> o.status() == ReviewsOutcome.Status.OK).count();

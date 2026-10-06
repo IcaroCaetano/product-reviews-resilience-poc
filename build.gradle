@@ -26,9 +26,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-	// Resilience4j - integra via starter dedicado para Spring Boot 3+ (anotações + autoconfig)
+	// Resilience4j - integra via starter dedicado para Spring Boot 3+ (anotações + autoconfig).
+	// Não é preciso declarar spring-boot-starter-aop à parte: o resilience4j-spring-boot3
+	// já traz spring-aop + aspectjweaver como dependências transitivas com versão própria
+	// (nessa versão do Spring Boot o starter-aop separado não existe mais no BOM).
 	implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

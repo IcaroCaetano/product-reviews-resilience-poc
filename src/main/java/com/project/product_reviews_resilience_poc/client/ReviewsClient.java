@@ -9,13 +9,6 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
-/**
- * Client HTTP "cru" para a Reviews API — sem nenhuma anotação de
- * resiliência. As anotações do Resilience4j (Circuit Breaker, Retry,
- * Rate Limiter, Bulkhead, Time Limiter) são aplicadas uma camada acima, em
- * {@code ProductReviewsResilienceService}, para manter este client simples
- * e cada demonstração isolada por módulo.
- */
 @Component
 public class ReviewsClient {
 
@@ -28,7 +21,7 @@ public class ReviewsClient {
     }
 
     public List<Review> fetchReviews(String productId) {
-        log.debug("Chamando Reviews API para productId={}", productId);
+        log.debug("Calling Reviews API to productId={}", productId);
         try {
             Review[] reviews = restClient.get()
                     .uri("/api/v1/reviews/{productId}", productId)
@@ -36,7 +29,7 @@ public class ReviewsClient {
                     .body(Review[].class);
             return reviews == null ? List.of() : List.of(reviews);
         } catch (RestClientException e) {
-            throw new ReviewsClientException("Falha ao chamar a Reviews API para productId=" + productId, e);
+            throw new ReviewsClientException("Error to call Reviews API to productId=" + productId, e);
         }
     }
 }

@@ -5,11 +5,11 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.client.RestTemplate;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -44,8 +44,14 @@ class RetryIntegrationTest {
         wireMockServer.stop();
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Value("${local.server.port}")
+    private int port;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String url(String path) {
+        return "http://localhost:" + port + path;
+    }
 
     @BeforeEach
     void resetWireMock() {
@@ -76,7 +82,7 @@ class RetryIntegrationTest {
                         .withBody("[{\"id\":\"r1\",\"productId\":\"p1\",\"author\":\"ana\",\"rating\":5,\"comment\":\"ótimo\"}]")));
 
         ReviewsOutcome outcome = restTemplate.getForObject(
-                "/api/v1/products/p1/reviews/retry", ReviewsOutcome.class);
+                url("/api/v1/products/p1/reviews/retry"), ReviewsOutcome.class);
 
         assertThat(outcome.status()).isEqualTo(ReviewsOutcome.Status.OK);
         assertThat(outcome.reviews()).hasSize(1);
@@ -89,7 +95,7 @@ class RetryIntegrationTest {
                 .willReturn(aResponse().withStatus(503)));
 
         ReviewsOutcome outcome = restTemplate.getForObject(
-                "/api/v1/products/p1/reviews/retry", ReviewsOutcome.class);
+                url("/api/v1/products/p1/reviews/retry"), ReviewsOutcome.class);
 
         assertThat(outcome.status()).isEqualTo(ReviewsOutcome.Status.FALLBACK);
         assertThat(outcome.message()).contains("ReviewsClientException");

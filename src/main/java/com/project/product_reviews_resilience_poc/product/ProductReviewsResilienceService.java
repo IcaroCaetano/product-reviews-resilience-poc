@@ -13,19 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-/**
- * Camada da Product API responsável por buscar reviews na Reviews API,
- * com cada método decorado por exatamente <b>um</b> módulo do Resilience4j.
- *
- * <p>A separação em um método por módulo (em vez de empilhar várias
- * anotações num único método) é intencional: cada endpoint em
- * {@link ProductReviewsController} fica isolado e serve para demonstrar e
- * testar um padrão de resiliência por vez.</p>
- *
- * <p>Os nomes das instâncias ("reviewsCircuitBreaker", "reviewsRetry",
- * "reviewsRateLimiter", "reviewsBulkhead", "reviewsTimeLimiter") são
- * configurados em {@code application.yaml} sob {@code resilience4j.*}.</p>
- */
 @Service
 public class ProductReviewsResilienceService {
 
