@@ -20,13 +20,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Demonstra o módulo <b>Circuit Breaker</b>: a Reviews API (simulada via
- * WireMock) fica indisponível, o circuito abre após o número mínimo de
- * chamadas falhas configurado em {@code resilience4j.circuitbreaker.instances.reviewsCircuitBreaker}
- * e as chamadas seguintes passam a ser rejeitadas localmente (sem nem chegar
- * à Reviews API), caindo no fallback.
- */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CircuitBreakerIntegrationTest {
 

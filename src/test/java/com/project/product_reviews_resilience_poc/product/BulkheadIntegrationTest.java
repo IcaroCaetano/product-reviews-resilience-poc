@@ -24,14 +24,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Demonstra o módulo <b>Bulkhead</b> (semáforo): a instância
- * {@code reviewsBulkhead} (application.yaml) permite no máximo 2 chamadas
- * concorrentes. Disparamos 5 chamadas simultâneas contra uma Reviews API
- * simulada com latência artificial (para garantir que elas se sobreponham no
- * tempo) e esperamos que ao menos uma delas seja rejeitada (bulkhead cheio)
- * e caia no fallback.
- */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BulkheadIntegrationTest {
 
@@ -93,10 +85,9 @@ class BulkheadIntegrationTest {
             long fallbackCount = outcomes.stream().filter(o -> o.status() == ReviewsOutcome.Status.FALLBACK).count();
 
             assertThat(okCount + fallbackCount).isEqualTo(totalCalls);
-            // maxConcurrentCalls=2 no application.yaml: com 5 chamadas simultâneas
-            // e 1s de latência artificial, pelo menos uma precisa ser rejeitada.
             assertThat(fallbackCount).isGreaterThanOrEqualTo(1);
             assertThat(okCount).isGreaterThanOrEqualTo(1);
+
             outcomes.stream()
                     .filter(o -> o.status() == ReviewsOutcome.Status.FALLBACK)
                     .forEach(o -> assertThat(o.message()).contains("BulkheadFullException"));

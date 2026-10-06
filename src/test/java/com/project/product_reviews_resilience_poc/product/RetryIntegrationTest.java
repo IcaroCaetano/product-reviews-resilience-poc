@@ -17,13 +17,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Demonstra o módulo <b>Retry</b>: a Reviews API (simulada via WireMock)
- * falha algumas vezes e depois se recupera (cenário stateful do WireMock),
- * e o Resilience4j tenta novamente de acordo com
- * {@code resilience4j.retry.instances.reviewsRetry} (maxAttempts=3, backoff
- * exponencial a partir de 200ms).
- */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RetryIntegrationTest {
 

@@ -19,12 +19,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Demonstra o módulo <b>Rate Limiter</b>: a instância
- * {@code reviewsRateLimiter} (application.yaml) permite apenas 2 chamadas
- * por janela de 10s e falha imediatamente (timeoutDuration=0) quando o
- * limite é excedido, ao invés de esperar.
- */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RateLimiterIntegrationTest {
 

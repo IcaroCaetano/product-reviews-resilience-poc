@@ -16,12 +16,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Demonstra o módulo <b>Time Limiter</b>: a instância
- * {@code reviewsTimeLimiter} (application.yaml) interrompe a chamada à
- * Reviews API caso ela demore mais que 1500ms, mesmo que o cliente HTTP
- * em si tenha um timeout de leitura bem maior ({@code app.reviews.read-timeout}).
- */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TimeLimiterIntegrationTest {
 
