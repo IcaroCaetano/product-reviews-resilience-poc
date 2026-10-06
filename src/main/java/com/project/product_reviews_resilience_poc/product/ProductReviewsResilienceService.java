@@ -68,10 +68,10 @@ public class ProductReviewsResilienceService {
     }
 
     private ReviewsOutcome rateLimiterFallback(String productId, Throwable throwable) {
-        log.warn("Rate Limiter 'reviewsRateLimiter' rejeitou a chamada para productId={}: {}",
+        log.warn("Rate Limiter 'reviewsRateLimiter' rejected the call to productId={}: {}",
                 productId, throwable.toString());
         return ReviewsOutcome.fallback(productId,
-                "Limite de requisições excedido (" + throwable.getClass().getSimpleName() + ").");
+                "Request limit exceeded (" + throwable.getClass().getSimpleName() + ").");
     }
 
     // ------------------------------------------------------------------
@@ -84,18 +84,15 @@ public class ProductReviewsResilienceService {
     }
 
     private ReviewsOutcome bulkheadFallback(String productId, Throwable throwable) {
-        log.warn("Bulkhead 'reviewsBulkhead' está cheio, rejeitando chamada para productId={}: {}",
+        log.warn("Bulkhead 'reviewsBulkhead' it's full, rejecting calls for productId={}: {}",
                 productId, throwable.toString());
         return ReviewsOutcome.fallback(productId,
-                "Capacidade concorrente do bulkhead esgotada (" + throwable.getClass().getSimpleName() + ").");
+                "Bulkhead concurrency capacity exhausted (" + throwable.getClass().getSimpleName() + ").");
     }
 
     // ------------------------------------------------------------------
     // Time Limiter
     // ------------------------------------------------------------------
-    // O @TimeLimiter do Resilience4j só funciona sobre métodos que retornam
-    // CompletionStage/CompletableFuture, por isso a chamada é despachada
-    // para um executor dedicado (timeLimiterExecutor).
 
     @TimeLimiter(name = "reviewsTimeLimiter", fallbackMethod = "timeLimiterFallback")
     public CompletableFuture<ReviewsOutcome> getReviewsWithTimeLimiter(String productId) {
@@ -105,9 +102,9 @@ public class ProductReviewsResilienceService {
     }
 
     private CompletableFuture<ReviewsOutcome> timeLimiterFallback(String productId, Throwable throwable) {
-        log.warn("Time Limiter 'reviewsTimeLimiter' interrompeu a chamada para productId={}: {}",
+        log.warn("Time Limiter 'reviewsTimeLimiter' interrupted the call to productId={}: {}",
                 productId, throwable.toString());
         return CompletableFuture.completedFuture(ReviewsOutcome.fallback(productId,
-                "Tempo limite excedido (" + throwable.getClass().getSimpleName() + ")."));
+                "Time limit exceeded(" + throwable.getClass().getSimpleName() + ")."));
     }
 }
