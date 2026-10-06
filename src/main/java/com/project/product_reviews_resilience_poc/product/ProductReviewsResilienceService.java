@@ -52,10 +52,10 @@ public class ProductReviewsResilienceService {
     }
 
     private ReviewsOutcome retryFallback(String productId, Throwable throwable) {
-        log.warn("Retry 'reviewsRetry' esgotou as tentativas para productId={}: {}",
+        log.warn("Retry 'reviewsRetry' exhausted attempts to productId={}: {}",
                 productId, throwable.toString());
         return ReviewsOutcome.fallback(productId,
-                "Tentativas de retry esgotadas (" + throwable.getClass().getSimpleName() + ").");
+                "Attempts on retry exhaust (" + throwable.getClass().getSimpleName() + ").");
     }
 
     // ------------------------------------------------------------------

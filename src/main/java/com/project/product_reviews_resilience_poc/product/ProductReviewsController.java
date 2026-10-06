@@ -6,15 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Product API: expõe um endpoint dedicado por módulo do Resilience4j,
- * cada um consultando a Reviews API através de
- * {@link ProductReviewsResilienceService}.
- *
- * <p>Essa separação (em vez de um único endpoint combinando os 5 módulos)
- * foi escolhida para a apresentação: cada padrão pode ser acionado e
- * demonstrado isoladamente.</p>
- */
 @RestController
 public class ProductReviewsController {
 
