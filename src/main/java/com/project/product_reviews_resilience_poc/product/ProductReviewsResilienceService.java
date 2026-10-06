@@ -97,8 +97,7 @@ public class ProductReviewsResilienceService {
     @TimeLimiter(name = "reviewsTimeLimiter", fallbackMethod = "timeLimiterFallback")
     public CompletableFuture<ReviewsOutcome> getReviewsWithTimeLimiter(String productId) {
         return CompletableFuture.supplyAsync(
-                () -> ReviewsOutcome.ok(productId, reviewsClient.fetchReviews(productId)),
-                timeLimiterExecutor);
+                () -> ReviewsOutcome.ok(productId, reviewsClient.fetchReviews(productId)), timeLimiterExecutor);
     }
 
     private CompletableFuture<ReviewsOutcome> timeLimiterFallback(String productId, Throwable throwable) {
