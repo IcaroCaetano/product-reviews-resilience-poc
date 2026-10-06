@@ -8,19 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Reviews API: serviço "remoto" (dependência) que a Product API consulta.
- *
- * <p>Além do endpoint "normal", este controller expõe parâmetros opcionais
- * {@code delayMs} e {@code fail} que permitem, numa demo em tempo real, forçar
- * lentidão ou erro na Reviews API para disparar manualmente o Circuit Breaker,
- * o Retry, o Rate Limiter, o Bulkhead ou o Time Limiter configurados na
- * Product API — sem precisar de ferramentas externas.</p>
- *
- * <p>Nos testes de integração automatizados, esse comportamento é simulado
- * via WireMock (ver {@code app.reviews.base-url}), então este controller não
- * é exercitado diretamente pelos testes de resiliência.</p>
- */
 @RestController
 public class ReviewsController {
 
